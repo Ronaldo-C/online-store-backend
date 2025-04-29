@@ -1,0 +1,40 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["nativeDistinct", "fullTextSearchPostgres"]
+  output          = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// 用戶狀態
+enum UserStatus {
+  active /// 正常
+  unusual /// 異常
+  locked /// 鎖定
+  deleted /// 刪除，軟刪除 - 可再次新增相同
+}
+
+/// 用戶角色
+enum UserRole {
+  superAdmin /// 超级管理员
+  admin /// 管理员
+  server /// 服务员
+}
+
+model User {
+  id         BigInt     @id @default(autoincrement())
+  name       String
+  password   String
+  email      String?
+  status     UserStatus @default(active)
+  userRole   UserRole   @default(server)
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  deletedAt  DateTime?  @map("deleted_at") /// 删除时间
+  operatedBy BigInt?    @map("operated_by") /// 操作者
+
+  @@map("users")
+}

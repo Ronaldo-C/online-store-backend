@@ -1,0 +1,94 @@
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
+import { LoginDto } from './dto/login.dto';
+import { JwtService } from '@nestjs/jwt';
+import { $Enums } from '@prisma/client';
+import * as crypto from 'crypto';
+import {
+  ERROR_AUTH_MESSAGE_CODE,
+  ERROR_NOTFOUND_MESSAGE_CODE,
+  ERROR_UNAUTHORIZED_MESSAGE_CODE,
+} from 'src/typeDefs/error-code';
+import { RedisService } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
+import { PrismaService } from 'src/shared/prisma/prisma.service';
+
+@Injectable()
+export class AuthService {
+  private readonly redis: Redis | null;
+
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly redisService: RedisService,
+    private readonly prisma: PrismaService,
+  ) {
+    this.redis = this.redisService.getOrThrow();
+  }
+
+  async login(loginDto: LoginDto) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        name: loginDto.name,
+        status: { not: $Enums.UserStatus.deleted },
+      },
+    });
+    if (!user) {
+      return new NotFoundException({
+        message: ERROR_NOTFOUND_MESSAGE_CODE.NOT_FOUND,
+      });
+    }
+    const password = this.signature({
+      identifier: loginDto.name,
+      password: loginDto.password,
+    });
+    if (password !== user.password) {
+      return new NotAcceptableException({
+        message: ERROR_UNAUTHORIZED_MESSAGE_CODE.UNAUTHORIZED,
+      });
+    }
+    if (user.status === $Enums.UserStatus.locked) {
+      return new NotAcceptableException({
+        message: ERROR_AUTH_MESSAGE_CODE.LOCKED,
+      });
+    }
+    if (user.status === $Enums.UserStatus.unusual) {
+      return new NotAcceptableException({
+        message: ERROR_AUTH_MESSAGE_CODE.STATUS_ERROR,
+      });
+    }
+
+    const accessToken = await this.jwtService.signAsync(user);
+    const key = `ACCESS_TOKEN_LOGIN_USER_${user.id}`;
+    await this.redis.set(accessToken, '1', 'EX', 3600 * 24 * 3);
+    await this.redis.sadd(key, accessToken);
+
+    return {
+      ...user,
+      accessToken,
+    };
+  }
+
+  signature(dto: { identifier: string; password: string }) {
+    const hash = crypto.createHash('sha256');
+    return hash.update(`${dto.identifier}_${dto.password}`).digest('hex');
+  }
+
+  async kickOut(userId: bigint, excludes?: string[]) {
+    const key = `ACCESS_TOKEN_LOGIN_USER_${userId.toString()}`;
+    const tokens = await this.redis.smembers(key);
+    await Promise.all(
+      tokens
+        .filter((token) => {
+          if (excludes) {
+            return !excludes.includes(token);
+          }
+          return true;
+        })
+        .map((token) => this.redis.del(token)),
+    );
+    await this.redis.del(key);
+  }
+}
