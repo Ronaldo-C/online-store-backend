@@ -1,6 +1,6 @@
 import {
+  BadRequestException,
   ConflictException,
-  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -8,12 +8,9 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { $Enums, Prisma } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import * as randomatic from 'randomatic';
-import {
-  ERROR_CONFLICT_MESSAGE_CODE,
-  ERROR_UNAUTHORIZED_MESSAGE_CODE,
-} from 'src/typeDefs/error-code';
+import { ERROR_CONFLICT_MESSAGE_CODE } from 'src/typeDefs/error-code';
 import { ListUserDto } from './dto/list-user.dto';
 import { paginateData } from 'src/typeDefs/list-dto';
 import { AuthService } from '../auth/auth.service';
@@ -44,28 +41,18 @@ export class UsersService {
 
     const password = randomatic('Aa0', 14);
 
-    const user = await this.prisma.$transaction(async (tx) => {
-      const user = await tx.user.create({
-        data: {
-          name: createUserDto.name,
-          email: createUserDto.email,
-          userRole: createUserDto.userRole,
-          password: this.authService.signature({
-            identifier: createUserDto.name,
-            password,
-          }),
-        },
-      });
-      const userId = user.id;
-      await tx.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          operatedBy: userId,
-        },
-      });
-      return user;
+    const user = await this.prisma.user.create({
+      data: {
+        name: createUserDto.name,
+        email: createUserDto.email,
+        userRole: createUserDto.userRole,
+        password: this.authService.signature({
+          identifier: createUserDto.name,
+          password,
+        }),
+        operatedBy: this.request.user.id,
+        createdAt: new Date(),
+      },
     });
 
     return {
@@ -159,13 +146,39 @@ export class UsersService {
         name: updateUserDto.name || updateUser.name,
         email: updateUserDto.email || updateUser.email,
         userRole: updateUserDto.userRole || updateUser.userRole,
+        updatedAt: new Date(),
         operatedBy: this.request.user.id,
       },
     });
     return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: bigint) {
+    if (id === this.request.user.id) {
+      throw new BadRequestException(
+        `id|${ERROR_CONFLICT_MESSAGE_CODE.INVALID_RELATION}`,
+      );
+    }
+
+    const previousUser = await this.detail(id);
+    if (previousUser.status === 'deleted') {
+      throw new BadRequestException({
+        message: `id|${ERROR_CONFLICT_MESSAGE_CODE.INVALID_RELATION}`,
+      });
+    }
+
+    const user = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        status: 'deleted',
+        operatedBy: this.request.user.id,
+        deletedAt: new Date(),
+      },
+    });
+    await this.authService.kickOut(id);
+
+    return user;
   }
 }

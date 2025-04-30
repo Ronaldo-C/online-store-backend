@@ -14,7 +14,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ListUserDto } from './dto/list-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
-import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bitInt-pipe';
+import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bigint-pipe';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { $Enums } from '@prisma/client';
 
@@ -41,6 +41,11 @@ export class UsersController {
     return this.usersService.detail(id);
   }
 
+  @Patch('info')
+  updateInfo(@Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateInfo(updateUserDto);
+  }
+
   @Patch(':id')
   @Roles($Enums.UserRole.superAdmin)
   update(
@@ -52,12 +57,7 @@ export class UsersController {
 
   @Delete(':id')
   @Roles($Enums.UserRole.superAdmin)
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
-  }
-
-  @Patch('info')
-  updateInfo(@Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateInfo(updateUserDto);
+  remove(@Param('id', ParseBigIntPipe) id: bigint) {
+    return this.usersService.remove(id);
   }
 }
