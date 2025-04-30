@@ -11,6 +11,7 @@ import Redis from 'ioredis';
 import { UsersService } from '../users/users.service';
 import { ERROR_UNAUTHORIZED_MESSAGE_CODE } from 'src/typeDefs/error-code';
 import { $Enums } from '@prisma/client';
+import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -20,6 +21,7 @@ export class AuthGuard implements CanActivate {
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
     private readonly userService: UsersService,
+    private readonly reflector: Reflector,
   ) {
     this.redis = this.redisService.getOrThrow();
   }
@@ -36,6 +38,16 @@ export class AuthGuard implements CanActivate {
       const payload = await this.jwtService.verifyAsync(token);
       const id = BigInt(payload['id']);
       const user = await this.userService.detail(id);
+
+      const roles = this.reflector.get<$Enums.UserRole[]>(
+        'roles',
+        context.getHandler(),
+      );
+      if (roles && roles.length > 0 && !roles.includes(user.userRole)) {
+        throw new UnauthorizedException(
+          ERROR_UNAUTHORIZED_MESSAGE_CODE.UNAUTHORIZED,
+        );
+      }
 
       if (user.status !== $Enums.UserStatus.active) {
         throw new UnauthorizedException(
