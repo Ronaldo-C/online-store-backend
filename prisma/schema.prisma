@@ -21,7 +21,6 @@ enum UserStatus {
 enum UserRole {
   superAdmin /// 超级管理员
   admin /// 管理员
-  server /// 服务员
 }
 
 model User {
@@ -30,7 +29,7 @@ model User {
   password   String
   email      String?
   status     UserStatus @default(active)
-  userRole   UserRole   @default(server)
+  userRole   UserRole   @default(admin)
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")
   deletedAt  DateTime?  @map("deleted_at") /// 删除时间

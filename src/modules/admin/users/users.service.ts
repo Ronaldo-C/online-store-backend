@@ -1,21 +1,30 @@
 import {
   ConflictException,
+  ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
+  Scope,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma } from '@prisma/client';
+import { $Enums, Prisma } from '@prisma/client';
 import * as randomatic from 'randomatic';
-import { ERROR_CONFLICT_MESSAGE_CODE } from 'src/typeDefs/error-code';
+import {
+  ERROR_CONFLICT_MESSAGE_CODE,
+  ERROR_UNAUTHORIZED_MESSAGE_CODE,
+} from 'src/typeDefs/error-code';
 import { ListUserDto } from './dto/list-user.dto';
 import { paginateData } from 'src/typeDefs/list-dto';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
+import { REQUEST } from '@nestjs/core';
+import { TRequest } from 'src/typeDefs/request';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UsersService {
   constructor(
+    @Inject(REQUEST) private readonly request: TRequest,
     private readonly prisma: PrismaService,
     private readonly authService: AuthService,
   ) {}
@@ -119,8 +128,41 @@ export class UsersService {
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async updateInfo(updateUserDto: UpdateUserDto) {
+    return this.update(this.request.user.id, updateUserDto);
+  }
+
+  async update(id: bigint, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.name) {
+      const exist = await this.prisma.user.findFirst({
+        where: {
+          name: updateUserDto.name,
+          status: { not: 'deleted' },
+          id: { not: id },
+        },
+      });
+
+      if (exist) {
+        throw new ConflictException(
+          `name|${ERROR_CONFLICT_MESSAGE_CODE.DUPLICATE_SLUG}`,
+        );
+      }
+    }
+
+    const updateUser = await this.detail(id);
+
+    const user = await this.prisma.user.update({
+      where: {
+        id,
+      },
+      data: {
+        name: updateUserDto.name || updateUser.name,
+        email: updateUserDto.email || updateUser.email,
+        userRole: updateUserDto.userRole || updateUser.userRole,
+        operatedBy: this.request.user.id,
+      },
+    });
+    return user;
   }
 
   remove(id: number) {
