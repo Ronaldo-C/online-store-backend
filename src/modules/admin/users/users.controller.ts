@@ -17,6 +17,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bigint-pipe';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { $Enums } from '@prisma/client';
+import { UpdateSelfDto } from './dto/update-self.dto';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -37,13 +38,20 @@ export class UsersController {
 
   @Get(':id')
   @Roles($Enums.UserRole.superAdmin)
-  findOne(@Param('id') id: bigint) {
+  detail(@Param('id') id: bigint) {
     return this.usersService.detail(id);
   }
 
+  // 获取用户自身信息
+  @Get('info')
+  info() {
+    return this.usersService.info();
+  }
+
+  // 编辑用户自身信息
   @Patch('info')
-  updateInfo(@Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateInfo(updateUserDto);
+  updateInfo(@Body() updateSelfDto: UpdateSelfDto) {
+    return this.usersService.updateInfo(updateSelfDto);
   }
 
   @Patch(':id')
@@ -59,5 +67,19 @@ export class UsersController {
   @Roles($Enums.UserRole.superAdmin)
   remove(@Param('id', ParseBigIntPipe) id: bigint) {
     return this.usersService.remove(id);
+  }
+
+  //账号锁定
+  @Patch(':id/lock')
+  @Roles($Enums.UserRole.superAdmin)
+  lock(@Param('id', ParseBigIntPipe) id: bigint) {
+    return this.usersService.lock(id);
+  }
+
+  //账号解锁
+  @Patch(':id/unlock')
+  @Roles($Enums.UserRole.superAdmin)
+  unlock(@Param('id', ParseBigIntPipe) id: bigint) {
+    return this.usersService.unlock(id);
   }
 }

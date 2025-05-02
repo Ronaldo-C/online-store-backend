@@ -35,6 +35,12 @@ export class AuthGuard implements CanActivate {
       );
     }
     try {
+      const value = await this.redis.get(token);
+      if (!value) {
+        throw new UnauthorizedException(
+          ERROR_UNAUTHORIZED_MESSAGE_CODE.UNAUTHORIZED,
+        );
+      }
       const payload = await this.jwtService.verifyAsync(token);
       const id = BigInt(payload['id']);
       const user = await this.userService.detail(id);

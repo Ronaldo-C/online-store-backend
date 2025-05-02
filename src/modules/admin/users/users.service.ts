@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Inject,
   Injectable,
   NotFoundException,
@@ -8,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Prisma } from '@prisma/client';
+import { $Enums, Prisma } from '@prisma/client';
 import * as randomatic from 'randomatic';
 import { ERROR_CONFLICT_MESSAGE_CODE } from 'src/typeDefs/error-code';
 import { ListUserDto } from './dto/list-user.dto';
@@ -17,6 +18,7 @@ import { AuthService } from '../auth/auth.service';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { REQUEST } from '@nestjs/core';
 import { TRequest } from 'src/typeDefs/request';
+import { UpdateSelfDto } from './dto/update-self.dto';
 
 @Injectable({ scope: Scope.REQUEST })
 export class UsersService {
@@ -100,6 +102,10 @@ export class UsersService {
     return paginateData(users, total, listUserDto.page, listUserDto.size);
   }
 
+  async info() {
+    return this.detail(this.request.user.id);
+  }
+
   async detail(id: bigint) {
     const user = await this.prisma.user.findUnique({
       where: {
@@ -115,11 +121,11 @@ export class UsersService {
     return user;
   }
 
-  async updateInfo(updateUserDto: UpdateUserDto) {
-    return this.update(this.request.user.id, updateUserDto);
+  async updateInfo(updateUserDto: UpdateSelfDto) {
+    return this.update(this.request.user.id, updateUserDto, false);
   }
 
-  async update(id: bigint, updateUserDto: UpdateUserDto) {
+  async update(id: bigint, updateUserDto: UpdateUserDto, isUpdateRole = true) {
     if (updateUserDto.name) {
       const exist = await this.prisma.user.findFirst({
         where: {
@@ -138,17 +144,22 @@ export class UsersService {
 
     const updateUser = await this.detail(id);
 
+    const updateData: Prisma.UserUpdateInput = {
+      name: updateUserDto.name || updateUser.name,
+      email: updateUserDto.email || updateUser.email,
+      updatedAt: new Date(),
+      operatedBy: this.request.user.id,
+    };
+
+    if (isUpdateRole) {
+      updateData.userRole = updateUserDto.userRole || updateUser.userRole;
+    }
+
     const user = await this.prisma.user.update({
       where: {
         id,
       },
-      data: {
-        name: updateUserDto.name || updateUser.name,
-        email: updateUserDto.email || updateUser.email,
-        userRole: updateUserDto.userRole || updateUser.userRole,
-        updatedAt: new Date(),
-        operatedBy: this.request.user.id,
-      },
+      data: updateData,
     });
     return user;
   }
@@ -180,5 +191,45 @@ export class UsersService {
     await this.authService.kickOut(id);
 
     return user;
+  }
+
+  async lock(id: bigint) {
+    if (id === this.request.user.id) {
+      throw new ForbiddenException(
+        ERROR_CONFLICT_MESSAGE_CODE.INCORRECT_OPERATION,
+      );
+    }
+
+    const user = await this.detail(id);
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        status: $Enums.UserStatus.locked,
+        updatedAt: new Date(),
+        operatedBy: this.request.user.id,
+      },
+    });
+
+    await this.authService.kickOut(id);
+
+    return updatedUser;
+  }
+
+  async unlock(id: bigint) {
+    const user = await this.detail(id);
+    const updatedUser = await this.prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        status: $Enums.UserStatus.active,
+        updatedAt: new Date(),
+        operatedBy: this.request.user.id,
+      },
+    });
+
+    return updatedUser;
   }
 }
