@@ -37,3 +37,52 @@ model User {
 
   @@map("users")
 }
+
+model Product {
+  id          BigInt            @id @default(autoincrement())
+  name        String
+  number      String
+  shelfStatus Boolean
+  thumbnail   String
+  pictures    Json?
+  description Json?
+  skus        ProductSku[]
+  categories  ProductCategory[]
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  deletedAt   DateTime?         @map("deleted_at") /// 删除时间
+  operatedBy  BigInt?           @map("operated_by") /// 操作者
+
+  @@map("products")
+}
+
+model ProductCategory {
+  id         BigInt    @id @default(autoincrement())
+  name       String
+  products   Product[]
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at") /// 删除时间
+  operatedBy BigInt?   @map("operated_by") /// 操作者
+
+  @@map("productCategories")
+}
+
+model ProductSku {
+  id        BigInt @id @default(autoincrement())
+  name      String
+  number    String
+  costPrice Float
+  price     Float
+  stock     BigInt
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId BigInt
+
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at") /// 删除时间
+  operatedBy BigInt?   @map("operated_by") /// 操作者
+
+  @@map("productSkus")
+}
