@@ -67,6 +67,5 @@ export class CreateProductDto {
   @IsArray()
   @Transform(BigIntTransform)
   @IsBigInt({ each: true })
-  @IsOptional()
-  categoryIds?: bigint[];
+  categoryIds: bigint[];
 }
