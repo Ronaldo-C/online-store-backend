@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString, Max, Min } from 'class-validator';
 import { IsBigInt } from 'src/utils/custom-validators/isBigInt';
-import { BigIntTransform } from 'src/utils/transfroms/bigint';
+import { BigIntTransform } from 'src/utils/transforms/bigint';
 
 export class UpdatePasswordDto {
   @Transform(BigIntTransform)
