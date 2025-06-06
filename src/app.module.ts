@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { redisAsyncOptions } from './config/redis';
 import { SharedModule } from './shared';
+import { ProductsModule } from './modules/admin/products/products.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,6 +15,7 @@ import { SharedModule } from './shared';
     RedisModule.forRootAsync(redisAsyncOptions),
     AdminModule,
     SharedModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
