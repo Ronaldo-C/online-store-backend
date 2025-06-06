@@ -1,7 +1,7 @@
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { BooleanTransform } from 'src/utils/transfroms/boolean';
-import { SortTransform } from 'src/utils/transfroms/sort';
+import { BooleanTransform } from 'src/utils/transforms/boolean';
+import { SortTransform } from 'src/utils/transforms/sort';
 
 export class ListDto {
   @IsOptional()
