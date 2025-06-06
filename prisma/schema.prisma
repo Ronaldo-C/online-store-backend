@@ -44,12 +44,12 @@ model Product {
   number      String
   shelfStatus Boolean
   thumbnail   String
-  pictures    Json?
+  pictures    String[]
   description Json?
   skus        ProductSku[]
   categories  ProductCategory[]
   createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
+  updatedAt   DateTime          @default(now()) @updatedAt @map("updated_at")
   deletedAt   DateTime?         @map("deleted_at") /// 删除时间
   operatedBy  BigInt?           @map("operated_by") /// 操作者
 
@@ -71,7 +71,6 @@ model ProductCategory {
 model ProductSku {
   id        BigInt @id @default(autoincrement())
   name      String
-  number    String
   costPrice Float
   price     Float
   stock     BigInt
