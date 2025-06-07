@@ -14,7 +14,9 @@ import {
 } from 'src/typeDefs/error-code';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { isEmpty } from 'lodash';
+import { ListUserDto } from '../users/dto/list-user.dto';
 import { Prisma } from '@prisma/client';
+import { paginateData } from 'src/typeDefs/list-dto';
 
 @Injectable()
 export class ProductsService {
@@ -29,6 +31,12 @@ export class ProductsService {
     if (isEmpty(dto.skus)) {
       throw new BadRequestException(
         `skus|${ERROR_BAD_REQUEST_MESSAGE_CODE.EMPTY_ARRAY}`,
+      );
+    }
+
+    if (isEmpty(dto.categoryIds)) {
+      throw new BadRequestException(
+        `categories|${ERROR_BAD_REQUEST_MESSAGE_CODE.EMPTY_ARRAY}`,
       );
     }
 
@@ -156,6 +164,89 @@ export class ProductsService {
         },
       },
     });
+    return product;
+  }
+
+  async list(dto: ListUserDto) {
+    const where: Prisma.ProductWhereInput = {
+      deletedAt: null,
+    };
+    if (dto.search) {
+      where.OR = [
+        {
+          name: {
+            contains: dto.search,
+          },
+        },
+        {
+          number: {
+            equals: dto.search,
+          },
+        },
+      ];
+    }
+    const [products, total] = await this.prisma.$transaction([
+      this.prisma.product.findMany({
+        where,
+        skip: (dto.page - 1) * dto.size,
+        take: dto.size,
+        orderBy: {
+          id: 'desc',
+        },
+        omit: {
+          deletedAt: true,
+          operatedBy: true,
+        },
+        include: {
+          skus: {
+            where: {
+              deletedAt: null,
+            },
+            omit: {
+              deletedAt: true,
+              operatedBy: true,
+            },
+          },
+          categories: {
+            where: {
+              deletedAt: null,
+            },
+            omit: {
+              deletedAt: true,
+              operatedBy: true,
+            },
+          },
+        },
+      }),
+      this.prisma.product.count({
+        where,
+      }),
+    ]);
+    return paginateData(products, total, dto.page, dto.size);
+  }
+
+  async delete(id: bigint) {
+    const product = await this.prisma.$transaction(async (tx) => {
+      const product = await tx.product.update({
+        where: {
+          id,
+        },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+      await tx.productSku.updateMany({
+        where: {
+          productId: id,
+        },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+
+      return product;
+    });
+
     return product;
   }
 
