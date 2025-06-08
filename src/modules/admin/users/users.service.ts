@@ -12,8 +12,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { $Enums, Prisma } from '@prisma/client';
 import * as randomatic from 'randomatic';
 import { ERROR_CONFLICT_MESSAGE_CODE } from 'src/typeDefs/error-code';
-import { ListUserDto } from './dto/list-user.dto';
-import { paginateData } from 'src/typeDefs/list-dto';
+import { ListWithSearchDto, paginateData } from 'src/typeDefs/list-dto';
 import { AuthService } from '../auth/auth.service';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { REQUEST } from '@nestjs/core';
@@ -63,7 +62,7 @@ export class UsersService {
     };
   }
 
-  async list(listUserDto: ListUserDto) {
+  async list(listUserDto: ListWithSearchDto) {
     const where: Prisma.UserWhereInput = {
       status: { not: 'deleted' },
       deletedAt: null,

@@ -12,12 +12,12 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ListUserDto } from './dto/list-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bigint-pipe';
 import { Roles } from 'src/utils/decorators/roles.decorator';
 import { $Enums } from '@prisma/client';
 import { UpdateSelfDto } from './dto/update-self.dto';
+import { ListWithSearchDto } from 'src/typeDefs/list-dto';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -26,7 +26,7 @@ export class UsersController {
 
   @Get()
   @Roles($Enums.UserRole.superAdmin)
-  list(@Query() listUserDto: ListUserDto) {
+  list(@Query() listUserDto: ListWithSearchDto) {
     return this.usersService.list(listUserDto);
   }
 

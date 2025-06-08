@@ -3,6 +3,7 @@ import {
   ConflictException,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
@@ -11,12 +12,12 @@ import { CreateProductDto } from './dto/create-product.dto';
 import {
   ERROR_BAD_REQUEST_MESSAGE_CODE,
   ERROR_CONFLICT_MESSAGE_CODE,
+  ERROR_NOTFOUND_MESSAGE_CODE,
 } from 'src/typeDefs/error-code';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { isEmpty } from 'lodash';
-import { ListUserDto } from '../users/dto/list-user.dto';
 import { Prisma } from '@prisma/client';
-import { paginateData } from 'src/typeDefs/list-dto';
+import { ListWithSearchDto, paginateData } from 'src/typeDefs/list-dto';
 
 @Injectable()
 export class ProductsService {
@@ -164,10 +165,17 @@ export class ProductsService {
         },
       },
     });
+
+    if (!product) {
+      throw new NotFoundException(
+        `id|${ERROR_NOTFOUND_MESSAGE_CODE.NOT_FOUND}`,
+      );
+    }
+
     return product;
   }
 
-  async list(dto: ListUserDto) {
+  async list(dto: ListWithSearchDto) {
     const where: Prisma.ProductWhereInput = {
       deletedAt: null,
     };
