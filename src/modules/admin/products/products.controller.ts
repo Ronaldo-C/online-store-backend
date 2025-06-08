@@ -13,8 +13,8 @@ import { ProductsService } from './products.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ListUserDto } from '../users/dto/list-user.dto';
 import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bigint-pipe';
+import { ListWithSearchDto } from 'src/typeDefs/list-dto';
 
 @UseGuards(AuthGuard)
 @Controller('products')
@@ -40,8 +40,8 @@ export class ProductsController {
   }
 
   @Get()
-  list(@Query() listUserDto: ListUserDto) {
-    return this.productsService.list(listUserDto);
+  list(@Query() listProductDto: ListWithSearchDto) {
+    return this.productsService.list(listProductDto);
   }
 
   @Delete(':id')
