@@ -5,7 +5,7 @@ import { AssetsService } from './assets.service';
 export class AssetsController {
   constructor(private readonly assetsService: AssetsService) {}
 
-  @Get('getSignature')
+  @Get('get-signature')
   async getSignature() {
     return await this.assetsService.getSignatureForOSS();
   }
