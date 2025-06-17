@@ -7,7 +7,7 @@ import { Roles } from 'src/utils/decorators/roles.decorator';
 import { $Enums } from '@prisma/client';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
-@Controller('auth')
+@Controller('admin/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

@@ -17,7 +17,7 @@ import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bigint-pipe';
 import { ListWithSearchDto } from 'src/typeDefs/list-dto';
 
 @UseGuards(AuthGuard)
-@Controller('product-categories')
+@Controller('admin/product-categories')
 export class ProductCategoriesController {
   constructor(
     private readonly productCategoriesService: ProductCategoriesService,
