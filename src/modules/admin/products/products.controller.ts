@@ -14,7 +14,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bigint-pipe';
-import { ListWithSearchDto } from 'src/typeDefs/list-dto';
+import { ListProductDto } from './dto/list-product.dto';
 
 @UseGuards(AuthGuard)
 @Controller('admin/products')
@@ -40,7 +40,7 @@ export class ProductsController {
   }
 
   @Get()
-  list(@Query() listProductDto: ListWithSearchDto) {
+  list(@Query() listProductDto: ListProductDto) {
     return this.productsService.list(listProductDto);
   }
 

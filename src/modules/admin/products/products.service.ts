@@ -17,7 +17,8 @@ import {
 import { UpdateProductDto } from './dto/update-product.dto';
 import { isEmpty } from 'lodash';
 import { Prisma } from '@prisma/client';
-import { ListWithSearchDto, paginateData } from 'src/typeDefs/list-dto';
+import { paginateData } from 'src/typeDefs/list-dto';
+import { ListProductDto } from './dto/list-product.dto';
 
 @Injectable()
 export class ProductsService {
@@ -175,7 +176,7 @@ export class ProductsService {
     return product;
   }
 
-  async list(dto: ListWithSearchDto) {
+  async list(dto: ListProductDto) {
     const where: Prisma.ProductWhereInput = {
       deletedAt: null,
     };
@@ -192,6 +193,15 @@ export class ProductsService {
           },
         },
       ];
+    }
+    if (dto.categoryIds && dto.categoryIds.length > 0) {
+      where.categories = {
+        some: {
+          id: {
+            in: dto.categoryIds,
+          },
+        },
+      };
     }
     const [products, total] = await this.prisma.$transaction([
       this.prisma.product.findMany({
