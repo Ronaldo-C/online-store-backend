@@ -85,6 +85,11 @@ export class UsersService {
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         where,
+        omit: {
+          password: true,
+          deletedAt: true,
+          operatedBy: true,
+        },
         skip: (listUserDto.page - 1) * listUserDto.size,
         take: listUserDto.size,
         orderBy: [
@@ -109,6 +114,11 @@ export class UsersService {
     const user = await this.prisma.user.findUnique({
       where: {
         id,
+      },
+      omit: {
+        password: true,
+        deletedAt: true,
+        operatedBy: true,
       },
     });
     if (!user) {
@@ -158,6 +168,11 @@ export class UsersService {
       where: {
         id,
       },
+      omit: {
+        password: true,
+        deletedAt: true,
+        operatedBy: true,
+      },
       data: updateData,
     });
     return user;
@@ -186,6 +201,11 @@ export class UsersService {
         operatedBy: this.request.user.id,
         deletedAt: new Date(),
       },
+      omit: {
+        password: true,
+        deletedAt: true,
+        operatedBy: true,
+      },
     });
     await this.authService.kickOut(id);
 
@@ -209,6 +229,11 @@ export class UsersService {
         updatedAt: new Date(),
         operatedBy: this.request.user.id,
       },
+      omit: {
+        password: true,
+        deletedAt: true,
+        operatedBy: true,
+      },
     });
 
     await this.authService.kickOut(id);
@@ -226,6 +251,11 @@ export class UsersService {
         status: $Enums.UserStatus.active,
         updatedAt: new Date(),
         operatedBy: this.request.user.id,
+      },
+      omit: {
+        password: true,
+        deletedAt: true,
+        operatedBy: true,
       },
     });
 
