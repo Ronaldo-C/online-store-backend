@@ -7,6 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { readFileSync } from 'fs';
 import { SWAGGER_AUTH_USERS } from './constants/swagger';
 import { Logger } from 'nestjs-pino';
+import { HttpExceptionFilter } from './utils/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
@@ -51,6 +52,8 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new TransformInterceptor());
+
+  app.useGlobalFilters(new HttpExceptionFilter());
 
   try {
     await app.listen(configService.get('APP_PORT'));
