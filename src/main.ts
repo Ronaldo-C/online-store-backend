@@ -6,10 +6,14 @@ import { TransformInterceptor } from './utils/interceptors/transform.interceptor
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { readFileSync } from 'fs';
 import { SWAGGER_AUTH_USERS } from './constants/swagger';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
   const configService = app.get(ConfigService);
+
+  const logger = app.get(Logger);
+  app.useLogger(logger);
 
   app.enableVersioning({
     type: VersioningType.URI,
@@ -48,6 +52,15 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  await app.listen(configService.get('APP_PORT'));
+  try {
+    await app.listen(configService.get('APP_PORT'));
+    logger.verbose(
+      `Application is running on: ${await app.getUrl()}, env: ${configService.get(
+        'NODE_ENV',
+      )}`,
+    );
+  } catch (error) {
+    logger.error(error, error.stack);
+  }
 }
 bootstrap();
