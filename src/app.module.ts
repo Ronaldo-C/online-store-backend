@@ -6,7 +6,6 @@ import { ConfigModule } from '@nestjs/config';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
 import { redisAsyncOptions } from './config/redis';
 import { SharedModule } from './shared';
-import { ProductsModule } from './modules/admin/products/products.module';
 import { AssetsModule } from './modules/assets/assets.module';
 import { LoggerModule } from 'nestjs-pino';
 import { pinoAsyncOptions } from './config/logger';
@@ -19,7 +18,6 @@ import { pinoAsyncOptions } from './config/logger';
     RedisModule.forRootAsync(redisAsyncOptions),
     AdminModule,
     SharedModule,
-    ProductsModule,
     AssetsModule,
   ],
   controllers: [AppController],

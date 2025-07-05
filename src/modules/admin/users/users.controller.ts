@@ -56,17 +56,6 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @ApiOperation({ summary: '获取用户详情' })
-  @ApiOkResponse({
-    description: '成功',
-    type: UserEntity,
-  })
-  @Get(':id')
-  @Roles($Enums.UserRole.superAdmin)
-  detail(@Param('id') id: bigint) {
-    return this.usersService.detail(id);
-  }
-
   // 获取用户自身信息
   @ApiOperation({ summary: '获取用户自身信息' })
   @ApiOkResponse({
@@ -76,6 +65,17 @@ export class UsersController {
   @Get('info')
   info() {
     return this.usersService.info();
+  }
+
+  @ApiOperation({ summary: '获取用户详情' })
+  @ApiOkResponse({
+    description: '成功',
+    type: UserEntity,
+  })
+  @Get(':id')
+  @Roles($Enums.UserRole.superAdmin)
+  detail(@Param('id') id: bigint) {
+    return this.usersService.detail(id);
   }
 
   // 编辑用户自身信息

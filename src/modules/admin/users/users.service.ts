@@ -45,6 +45,7 @@ export class UsersService {
     const user = await this.prisma.user.create({
       data: {
         name: createUserDto.name,
+        username: createUserDto.username,
         email: createUserDto.email,
         userRole: createUserDto.userRole,
         password: this.authService.signature({
@@ -75,6 +76,11 @@ export class UsersService {
           },
         },
         {
+          username: {
+            contains: listUserDto.search,
+          },
+        },
+        {
           email: {
             contains: listUserDto.search,
           },
@@ -92,11 +98,7 @@ export class UsersService {
         },
         skip: (listUserDto.page - 1) * listUserDto.size,
         take: listUserDto.size,
-        orderBy: [
-          {
-            id: 'desc',
-          },
-        ],
+        orderBy: listUserDto.sort,
       }),
       this.prisma.user.count({
         where,
@@ -155,6 +157,7 @@ export class UsersService {
 
     const updateData: Prisma.UserUpdateInput = {
       name: updateUserDto.name || updateUser.name,
+      username: updateUserDto.username || updateUser.username,
       email: updateUserDto.email || updateUser.email,
       updatedAt: new Date(),
       operatedBy: this.request.user.id,

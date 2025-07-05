@@ -25,7 +25,8 @@ enum UserRole {
 
 model User {
   id         BigInt     @id @default(autoincrement())
-  name       String
+  name       String ///账户
+  username   String ///用户名
   password   String
   email      String?
   status     UserStatus @default(active)

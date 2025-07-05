@@ -1,5 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsString, Max, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
+} from 'class-validator';
 import { IsBigInt } from 'src/utils/custom-validators/isBigInt';
 import { BigIntTransform } from 'src/utils/transforms/bigint';
 
@@ -10,13 +17,11 @@ export class UpdatePasswordDto {
 
   @IsNotEmpty()
   @IsString()
-  @Min(8)
-  @Max(20)
   password: string;
 
   @IsNotEmpty()
   @IsString()
-  @Min(8)
-  @Max(20)
+  @MinLength(8)
+  @MaxLength(20)
   updatedPassword: string;
 }
