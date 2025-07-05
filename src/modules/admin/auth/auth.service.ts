@@ -45,7 +45,7 @@ export class AuthService {
       },
     });
     if (!user) {
-      return new NotFoundException({
+      throw new NotFoundException({
         message: ERROR_NOTFOUND_MESSAGE_CODE.NOT_FOUND,
       });
     }
@@ -54,17 +54,17 @@ export class AuthService {
       password: loginDto.password,
     });
     if (password !== user.password) {
-      return new NotAcceptableException({
+      throw new NotAcceptableException({
         message: ERROR_UNAUTHORIZED_MESSAGE_CODE.UNAUTHORIZED,
       });
     }
     if (user.status === $Enums.UserStatus.locked) {
-      return new NotAcceptableException({
+      throw new NotAcceptableException({
         message: ERROR_AUTH_MESSAGE_CODE.LOCKED,
       });
     }
     if (user.status === $Enums.UserStatus.unusual) {
-      return new NotAcceptableException({
+      throw new NotAcceptableException({
         message: ERROR_AUTH_MESSAGE_CODE.STATUS_ERROR,
       });
     }
@@ -131,8 +131,9 @@ export class AuthService {
       identifier: user.name,
       password: updatePasswordDto.password,
     });
-    if (originPassword !== updatePasswordDto.password) {
-      return new NotAcceptableException({
+
+    if (originPassword !== user.password) {
+      throw new NotAcceptableException({
         message: ERROR_UNAUTHORIZED_MESSAGE_CODE.UNAUTHORIZED,
       });
     }

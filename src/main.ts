@@ -11,6 +11,8 @@ import { HttpExceptionFilter } from './utils/filters/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.enableCors();
+
   const configService = app.get(ConfigService);
 
   const logger = app.get(Logger);
@@ -51,9 +53,9 @@ async function bootstrap() {
     }),
   );
 
-  app.useGlobalInterceptors(new TransformInterceptor());
-
   app.useGlobalFilters(new HttpExceptionFilter());
+
+  app.useGlobalInterceptors(new TransformInterceptor());
 
   try {
     await app.listen(configService.get('APP_PORT'));

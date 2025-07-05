@@ -8,9 +8,14 @@ export class UserEntity {
   id: bigint;
 
   @ApiProperty({
-    description: '用户名称',
+    description: '账户',
   })
   name: string;
+
+  @ApiProperty({
+    description: '用户名称',
+  })
+  username: string;
 
   @ApiProperty({
     description: '用户密码',

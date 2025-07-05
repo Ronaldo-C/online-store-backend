@@ -12,15 +12,26 @@ import {
 
 export class CreateUserDto {
   @ApiProperty({
-    description: '用户名',
+    description: '账号',
     type: String,
-    minLength: 4,
+    minLength: 1,
     maxLength: 20,
   })
   @IsString()
   @MinLength(4)
   @MaxLength(20)
   name: string;
+
+  @ApiProperty({
+    description: '用户名',
+    type: String,
+    minLength: 4,
+    maxLength: 20,
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(20)
+  username: string;
 
   @ApiProperty({
     description: '邮箱',
@@ -32,7 +43,7 @@ export class CreateUserDto {
   email?: string;
 
   @ApiProperty({
-    description: '邮箱',
+    description: '用戶角色',
     enum: $Enums.UserRole,
   })
   @IsEnum($Enums.UserRole)
