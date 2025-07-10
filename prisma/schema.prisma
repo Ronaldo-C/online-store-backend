@@ -86,3 +86,17 @@ model ProductSku {
 
   @@map("productSkus")
 }
+
+model SeoMeta {
+  id          BigInt  @id @default(autoincrement())
+  title       String?
+  description String?
+
+  images Json[] @default([])
+
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  operatedBy BigInt?  @map("operated_by") /// 操作者
+
+  @@map("seoMetas")
+}
