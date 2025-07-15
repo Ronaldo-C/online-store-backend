@@ -9,6 +9,7 @@ import { SharedModule } from './shared';
 import { AssetsModule } from './modules/assets/assets.module';
 import { LoggerModule } from 'nestjs-pino';
 import { pinoAsyncOptions } from './config/logger';
+import { CustomerModule } from './modules/customer/customer.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,6 +20,7 @@ import { pinoAsyncOptions } from './config/logger';
     AdminModule,
     SharedModule,
     AssetsModule,
+    CustomerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

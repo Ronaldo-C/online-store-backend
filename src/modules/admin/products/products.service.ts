@@ -19,10 +19,13 @@ import { isEmpty } from 'lodash';
 import { Prisma } from '@prisma/client';
 import { paginateData } from 'src/typeDefs/list-dto';
 import { ListProductDto } from './dto/list-product.dto';
+import { CacheService } from 'src/shared/cache/cache.service';
+import { RedisKey } from 'src/constants/redisKey';
 
 @Injectable()
 export class ProductsService {
   constructor(
+    private readonly cacheService: CacheService,
     @Inject(REQUEST) private readonly request: TRequest,
     private readonly prisma: PrismaService,
   ) {}
@@ -70,6 +73,10 @@ export class ProductsService {
         operatedBy: this.request.user.id,
       },
     });
+
+    this.cacheService.del(RedisKey.productDetail(product.id));
+    this.cacheService.del(RedisKey.productList);
+
     return this.detail(product.id);
   }
 
@@ -131,6 +138,9 @@ export class ProductsService {
 
       return product;
     });
+
+    this.cacheService.del(RedisKey.productDetail(product.id));
+    this.cacheService.del(RedisKey.productList);
 
     return this.detail(product.id);
   }
@@ -264,6 +274,9 @@ export class ProductsService {
 
       return product;
     });
+
+    this.cacheService.del(RedisKey.productDetail(product.id));
+    this.cacheService.del(RedisKey.productList);
 
     return product;
   }

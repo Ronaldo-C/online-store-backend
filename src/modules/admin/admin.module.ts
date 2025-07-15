@@ -7,7 +7,13 @@ import { ProductCategoriesModule } from './product-categories/product-categories
 import { SeoMetasModule } from './seo-metas/seo-metas.module';
 
 @Module({
-  imports: [AuthModule, UsersModule, ProductsModule, ProductCategoriesModule, SeoMetasModule],
+  imports: [
+    AuthModule,
+    UsersModule,
+    ProductsModule,
+    ProductCategoriesModule,
+    SeoMetasModule,
+  ],
   providers: [InitService],
 })
 export class AdminModule {}

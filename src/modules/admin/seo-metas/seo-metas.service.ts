@@ -4,10 +4,13 @@ import { SeoMetaEntity } from './entities/seo-metas.entity';
 import { UpdateSeoMetasDto } from './dto/update-seo-metas.dto';
 import { REQUEST } from '@nestjs/core';
 import { TRequest } from 'src/typeDefs/request';
+import { CacheService } from 'src/shared/cache/cache.service';
+import { RedisKey } from 'src/constants/redisKey';
 
 @Injectable()
 export class SeoMetasService {
   constructor(
+    private readonly cacheService: CacheService,
     private readonly prisma: PrismaService,
     @Inject(REQUEST) private readonly request: TRequest,
   ) {}
@@ -19,6 +22,9 @@ export class SeoMetasService {
 
   async update(dto: UpdateSeoMetasDto) {
     const item = await this.prisma.seoMeta.findFirst();
+
+    this.cacheService.del(RedisKey.seoMeta);
+
     if (!item) {
       const seoMeta = await this.prisma.seoMeta.create({
         data: {

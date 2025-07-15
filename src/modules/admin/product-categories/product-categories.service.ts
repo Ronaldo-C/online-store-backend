@@ -14,10 +14,13 @@ import {
   ERROR_NOTFOUND_MESSAGE_CODE,
 } from 'src/typeDefs/error-code';
 import { ListWithSearchDto, paginateData } from 'src/typeDefs/list-dto';
+import { CacheService } from 'src/shared/cache/cache.service';
+import { RedisKey } from 'src/constants/redisKey';
 
 @Injectable()
 export class ProductCategoriesService {
   constructor(
+    private readonly cacheService: CacheService,
     @Inject(REQUEST) private readonly request: TRequest,
     private readonly prisma: PrismaService,
   ) {}
@@ -31,6 +34,9 @@ export class ProductCategoriesService {
         operatedBy: this.request.user.id,
       },
     });
+
+    this.cacheService.del(RedisKey.productCategoryList);
+
     return this.detail(category.id);
   }
 
@@ -47,6 +53,8 @@ export class ProductCategoriesService {
         operatedBy: this.request.user.id,
       },
     });
+
+    this.cacheService.del(RedisKey.productCategoryList);
 
     return this.detail(category.id);
   }
@@ -113,6 +121,8 @@ export class ProductCategoriesService {
         operatedBy: this.request.user.id,
       },
     });
+
+    this.cacheService.del(RedisKey.productCategoryList);
 
     return category;
   }
