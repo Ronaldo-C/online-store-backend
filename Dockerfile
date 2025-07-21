@@ -36,4 +36,4 @@ COPY --chown=node:node --from=development /app/node_modules/.prisma ./node_modul
 
 EXPOSE 3000
 
-CMD ["node", "/dist/main.js"]
+CMD ["node", "app/dist/main.js"]
