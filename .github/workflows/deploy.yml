@@ -18,6 +18,6 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /home/${{ secrets.SERVER_USER }}/online-store-backend
+            cd /${{ secrets.SERVER_USER }}/online-store-backend
             chmod +x deploy.sh
             ./deploy.sh
