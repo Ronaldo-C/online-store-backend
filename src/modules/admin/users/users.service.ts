@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { $Enums, Prisma } from '@prisma/client';
+import { $Enums, Prisma } from '.prisma/client';
 import * as randomatic from 'randomatic';
 import { ERROR_CONFLICT_MESSAGE_CODE } from 'src/typeDefs/error-code';
 import { ListWithSearchDto, paginateData } from 'src/typeDefs/list-dto';

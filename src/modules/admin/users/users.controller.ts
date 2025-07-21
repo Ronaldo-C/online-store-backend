@@ -15,7 +15,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { ParseBigIntPipe } from 'src/utils/parse-pipes/parse-bigint-pipe';
 import { Roles } from 'src/utils/decorators/roles.decorator';
-import { $Enums } from '@prisma/client';
+import { $Enums } from '.prisma/client';
 import { UpdateSelfDto } from './dto/update-self.dto';
 import { ListWithSearchDto, PaginatedResponseDto } from 'src/typeDefs/list-dto';
 import {

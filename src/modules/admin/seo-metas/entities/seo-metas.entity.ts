@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SeoMeta } from '@prisma/client';
+import { SeoMeta } from '.prisma/client';
 
 export class SeoMetaEntity {
   @ApiProperty({

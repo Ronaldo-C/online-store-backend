@@ -4,7 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { AuthGuard } from './auth.guard';
 import { Roles } from 'src/utils/decorators/roles.decorator';
-import { $Enums } from '@prisma/client';
+import { $Enums } from '.prisma/client';
 import { UpdatePasswordDto } from './dto/update-password.dto';
 
 @Controller('admin/auth')

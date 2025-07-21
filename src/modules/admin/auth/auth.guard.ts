@@ -10,7 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import Redis from 'ioredis';
 import { UsersService } from '../users/users.service';
 import { ERROR_UNAUTHORIZED_MESSAGE_CODE } from 'src/typeDefs/error-code';
-import { $Enums } from '@prisma/client';
+import { $Enums } from '.prisma/client';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()

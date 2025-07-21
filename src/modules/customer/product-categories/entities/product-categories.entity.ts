@@ -1,4 +1,4 @@
-import { ProductCategory } from '@prisma/client';
+import { ProductCategory } from '.prisma/client';
 
 export class ProductCategoryEntity {
   id: bigint;

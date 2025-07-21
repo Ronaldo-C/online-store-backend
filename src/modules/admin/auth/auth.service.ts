@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { $Enums } from '@prisma/client';
+import { $Enums } from '.prisma/client';
 import * as crypto from 'crypto';
 import {
   ERROR_AUTH_MESSAGE_CODE,

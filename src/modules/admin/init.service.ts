@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import * as crypto from 'crypto';
-import { $Enums } from '@prisma/client';
+import { $Enums } from '.prisma/client';
 
 @Injectable()
 export class InitService implements OnModuleInit {

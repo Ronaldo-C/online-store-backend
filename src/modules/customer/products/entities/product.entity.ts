@@ -2,7 +2,7 @@ import {
   Product,
   ProductCategory,
   ProductSku as ProductSkuModel,
-} from '@prisma/client';
+} from '.prisma/client';
 import { ProductCategoryEntity } from '../../product-categories/entities/product-categories.entity';
 
 export class ProductEntity {
