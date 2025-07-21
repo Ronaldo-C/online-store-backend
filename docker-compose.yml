@@ -30,6 +30,8 @@ services:
     restart: always
     ports:
       - '3100:3000'
+    env_file:
+      - .env
     environment:
       NODE_ENV: production
       DATABASE_URL: 'postgresql://online_store_app:online_store_app@postgres:5432/onlineStore?schema=public'
