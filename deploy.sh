@@ -12,7 +12,7 @@ echo "等待服务启动..."
 sleep 20
 
 echo "运行数据库迁移..."
-docker-compose exec -T app pnpm prisma:migrate:deploy
+docker-compose exec -T app npx prisma migrate deploy
 
 echo "检查服务状态..."
 docker-compose ps
