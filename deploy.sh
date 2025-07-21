@@ -5,9 +5,6 @@ echo "🚀 开始部署项目..."
 echo "停止现有服务..."
 docker-compose down
 
-echo "拉取最新代码..."
-git pull origin main
-
 echo "构建并启动服务..."
 docker-compose up -d --build
 
