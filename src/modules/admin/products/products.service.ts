@@ -82,7 +82,11 @@ export class ProductsService {
 
   async update(id: bigint, dto: UpdateProductDto) {
     await this.validateParams(dto, id);
-
+    console.log(
+      dto.categoryIds,
+      dto.categoryIds.length,
+      dto.categoryIds.map((id) => ({ id })),
+    );
     const product = await this.prisma.$transaction(async (tx) => {
       const product = await tx.product.update({
         where: {
@@ -99,7 +103,7 @@ export class ProductsService {
           categories:
             dto.categoryIds && dto.categoryIds.length > 0
               ? {
-                  connect: dto.categoryIds.map((id) => ({ id })),
+                  set: dto.categoryIds.map((id) => ({ id })),
                 }
               : undefined,
           operatedBy: this.request.user.id,
